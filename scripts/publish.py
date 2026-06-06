@@ -148,6 +148,17 @@ def publish_container(ig_user_id: str, creation_id: str, access_token: str, dry_
     return post_id
 
 
+def get_permalink(post_id: str, access_token: str, api_version: str = API_VERSION) -> str | None:
+    """Step 4: resolve a numeric media id to its public shortcode URL."""
+    url = f"{GRAPH_BASE}/{api_version}/{post_id}?fields=permalink&access_token={urllib.parse.quote(access_token)}"
+    try:
+        result = http_get(url)
+    except urllib.error.HTTPError as e:
+        print(f"  (warning) permalink lookup failed (HTTP {e.code}): {explain_error(e)}")
+        return None
+    return result.get("permalink")
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -199,7 +210,12 @@ def main() -> None:
         print(f"✓ Dry-run complete — would publish creation_id={creation_id}")
     else:
         print(f"✓ Published: {post_id}")
-        print(f"  https://www.instagram.com/p/{post_id}")
+        # Step 4: resolve the numeric id to the real public shortcode URL
+        permalink = get_permalink(post_id, access_token, api_version=API_VERSION)
+        if permalink:
+            print(f"  {permalink}")
+        else:
+            print(f"  https://www.instagram.com/p/{post_id}  (fallback — permalink lookup failed)")
 
 
 if __name__ == "__main__":
