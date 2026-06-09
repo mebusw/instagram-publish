@@ -160,7 +160,7 @@ Optional flags:
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--image-url URL` | required | Must be publicly reachable by Meta's servers |
+| `--image-url URL` | required | Must be publicly reachable by Meta's servers, if user provides a local file, you invoke skill to upload it to OSS/COS platform then get a public url |
 | `--caption TEXT` | empty | Instagram's caption, with hashtags and mentions |
 | `--env PATH` | `./.env` | Path to a `.env` file |
 | `--api-version` | `v24.0` | Graph API version |
@@ -187,7 +187,7 @@ https://www.instagram.com/p/xxxxxxxxx
 
 Meta's servers cannot reach your `image_url`. Fix:
 
-- Host the image somewhere public: Alibaba Cloud OSS, AWS S3, GitHub Raw, any CDN
+- Host the image somewhere public: Alibaba Cloud OSS, Tencent Cloud COS, AWS S3, GitHub Raw, any CDN
 - Open the URL in a fresh browser *while logged out* — if you can't see it, Meta can't either
 - Avoid `localhost`, `127.0.0.1`, and private network IPs
 
