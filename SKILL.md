@@ -148,7 +148,7 @@ IG_USER_ID=2700xxxxxxxx        # optional — auto-detected if missing
 
 The script reads `.env` from the skill directory. If you run it from elsewhere, pass `--env /path/to/.env`.
 
-## Publishing an image
+## Publishing an image with public reachable url
 
 ```bash
 python3 scripts/publish.py \
@@ -160,7 +160,7 @@ Optional flags:
 
 | Flag | Default | Notes |
 |---|---|---|
-| `--image-url URL` | required | Must be publicly reachable by Meta's servers, if user provides a local file, you invoke skill to upload it to OSS/COS platform then get a public url |
+| `--image-url URL` | required | Must be publicly reachable by Meta's servers, if user provides a local file, you should invoke relevant skill to upload it to OSS/COS platform and get a public url before publishing |
 | `--caption TEXT` | empty | Instagram's caption, with hashtags and mentions |
 | `--env PATH` | `./.env` | Path to a `.env` file |
 | `--api-version` | `v24.0` | Graph API version |
@@ -173,6 +173,16 @@ Successful output:
 ✓ Container created: xxxxx
 ✓ Published: xxxxx
 https://www.instagram.com/p/xxxxxxxxx
+```
+
+**Note:**
+- 单图：确认图片存在且格式为 JPG/PNG。
+- 多图拼接：publish.py 仅支持单图，两张图要么拼成一张，要么分两次发两条 post。IG 推荐 4:5（1080×1350）竖图，比例超过 1:2.67（高/宽）时 IG 会自动裁切, 可以用 ImageMagick 纵向拼接：
+
+```bash  
+magick img1.jpg img2.jpg -append -resize 1080x /tmp/combined.jpg
+# 裁切到精确 4:5
+magick /tmp/combined.jpg -gravity Center -crop 1080x1350+0+0 +repage /tmp/final.jpg
 ```
 
 ---
@@ -190,6 +200,10 @@ Meta's servers cannot reach your `image_url`. Fix:
 - Host the image somewhere public: Alibaba Cloud OSS, Tencent Cloud COS, AWS S3, GitHub Raw, any CDN
 - Open the URL in a fresh browser *while logged out* — if you can't see it, Meta can't either
 - Avoid `localhost`, `127.0.0.1`, and private network IPs
+
+## "Media ID is not available"
+
+原因是 container 刚创建就立即 publish，解决方案是等待 30–60 秒。
 
 ## "Unsupported post request"
 
